@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>分镜审阅台</title>
+<link rel="stylesheet" href="style.css">
+<header><h1>分镜审阅台</h1><p>结合剧本意图审阅构图、景深和人物姿态。</p></header>
+<main>
+<aside>
+<label>导入剧本（TXT / MD）<input id="script" type="file" accept=".txt,.md"></label>
+<label>当前镜头的剧本文字<textarea id="excerpt" rows="7" placeholder="导入后可在这里保留当前镜头相关的动作和台词。"></textarea></label>
+<label>导入分镜草稿（可多选）<input id="images" type="file" accept="image/png,image/jpeg,image/webp" multiple></label>
+<label>当前分镜<select id="shot" disabled></select></label>
+<label>对焦意图<select id="focus"><option value="auto">从剧本提示推断</option><option value="shallow">突出主体</option><option value="deep">保留环境层次</option></select></label>
+</aside>
+<section>
+<div class="toolbar">
+<label>标注点<select id="point"></select></label>
+<label class="check"><input id="grid" type="checkbox" checked> 三分网格</label>
+<button id="remove" type="button" disabled>清除选中点</button>
+</div>
+<div id="stage"><p id="placeholder">导入草稿后，在画面上点击放置选中的标注点。</p><canvas id="canvas" hidden aria-label="分镜草稿与标注"></canvas></div>
+<p id="status" role="status"></p>
+</section>
+<aside>
+<h2>修改建议</h2>
+<div id="review" aria-live="polite"></div>
+<label>剧组备注<textarea id="notes" rows="4"></textarea></label>
+<div class="toolbar"><button id="export" disabled>导出审阅 JSON</button><button id="png" disabled>导出标注 PNG</button></div>
+</aside>
+</main>
+<script src="review.js"></script>
+<script src="app.js"></script>
+</html>
