@@ -273,7 +273,31 @@ ui.generateShots.addEventListener("click", () => {
       if (blob) download(blob, `storyboard-${index + 1}.png`);
       else ui.generationStatus.textContent = "无法生成分镜 PNG。";
     }));
-    card.append(title, frame, caption, button);
+    const controls = document.createElement("div");
+    controls.className = "frame-controls";
+    for (const [key, label, options] of [
+      ["scale", "景别", ["远景", "全景", "中景", "近景", "特写", "大特写"]],
+      ["camera", "机位", ["平视", "俯拍", "仰拍"]],
+      ["placement", "主体位置", ["左侧", "居中", "右侧"]],
+      ["action", "人物动作", ["站姿", "坐姿", "伸手", "奔跑"]],
+      ["location", "场景", ["室内", "街道", "自然外景"]]
+    ]) {
+      if (shot.empty && ["placement", "action"].includes(key)) continue;
+      const field = document.createElement("label");
+      field.textContent = label;
+      const select = document.createElement("select");
+      for (const option of options) select.add(new Option(option, option));
+      select.value = shot[key];
+      select.addEventListener("change", () => {
+        shot[key] = select.value;
+        title.textContent = `镜头 ${index + 1} · ${shot.scale}` + (shot.scene ? ` · ${shot.scene}` : "");
+        frame.setAttribute("aria-label", title.textContent);
+        drawStoryboardFrame(shot, frame);
+      });
+      field.append(select);
+      controls.append(field);
+    }
+    card.append(title, frame, caption, controls, button);
     ui.generatedShots.append(card);
   }
 });
