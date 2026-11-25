@@ -16,7 +16,9 @@ const assets = new Map([
   ["/app.js", ["app.js", "text/javascript"]],
   ["/review.js", ["review.js", "text/javascript"]],
   ["/samples.js", ["samples.js", "text/javascript"]],
-  ["/storyboard.js", ["storyboard.js", "text/javascript"]]
+  ["/storyboard.js", ["storyboard.js", "text/javascript"]],
+  ["/xlsx.full.min.js", ["xlsx.full.min.js", "text/javascript"]],
+  ["/excel-script.js", ["excel-script.js", "text/javascript"]]
 ]);
 const formats = new Set([".doc", ".docx", ".xls", ".xlsx"]);
 const maxBytes = 20 * 1024 * 1024;

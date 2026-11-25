@@ -128,6 +128,8 @@ ui.script.addEventListener("change", async () => {
     let contents;
     if (extension === ".txt" || extension === ".md") {
       contents = await file.text();
+    } else if (extension === ".xls" || extension === ".xlsx") {
+      contents = await readExcelScript(file);
     } else {
       const setup = "请在项目目录运行 node server.js，再用 Edge 或 Chrome 打开 http://127.0.0.1:8765/。";
       if (location.origin !== "http://127.0.0.1:8765") {

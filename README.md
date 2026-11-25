@@ -1,6 +1,6 @@
 # 分镜审阅台
 
-读取 TXT / Markdown 时可直接用浏览器打开 index.html。读取 Word 或 Excel 时，在 Windows 上安装并初始化 Microsoft Word 或 Excel，安装 Node.js，然后在本目录运行 `node server.js` 并打开 http://127.0.0.1:8765。Office 文件由本机服务读取，单文件上限 20 MB。Word 读取正文，Excel 按工作表顺序读取单元格值，工作表名作为标题，同行单元格以制表符分隔。
+读取 TXT / Markdown / Excel 时可直接用浏览器打开 index.html。读取 Word 时，在 Windows 上安装并初始化 Microsoft Word 或 Excel，安装 Node.js，然后在本目录运行 `node server.js` 并打开 http://127.0.0.1:8765。Word 文件由本机服务读取，Excel 文件由浏览器解析，单文件上限 20 MB。Word 读取正文，Excel 按工作表顺序读取单元格值，工作表名作为标题，同行单元格以制表符分隔。
 
 ## 操作流程
 
@@ -37,4 +37,8 @@ storyboard.js 根据景别、场景和动作关键词绘制人物轮廓及环境
 
 ### Office 导入遇到 HTTP 405
 
-双击 start-storyboard.cmd（或运行 node server.js），保持窗口打开，再用 Edge 或 Chrome 访问 http://127.0.0.1:8765/。静态预览和直接打开 index.html 只能导入纯文本剧本，Office 导入需要此地址提供的读取接口。如果已启动旧版服务，先在其窗口按 Ctrl+C，再启动新版。
+双击 start-storyboard.cmd（或运行 node server.js），保持窗口打开，再用 Edge 或 Chrome 访问 http://127.0.0.1:8765/。Word 导入需要此地址提供的读取接口。TXT、Markdown 和 Excel 可从静态预览或直接打开 index.html 导入。如果已启动旧版服务，先在其窗口按 Ctrl+C，再启动新版。
+
+### GitHub Pages 上导入 Excel
+
+将更新后的静态文件提交到 Pages 发布目录，包含 excel-script.js、xlsx.full.min.js 和 LICENSE-SheetJS.txt。Excel（.xls / .xlsx）由浏览器解析，不需要 Node.js、Microsoft Office 或读取接口。Word（.doc / .docx）仍需启动 Windows 本机服务；在 GitHub Pages 上可粘贴 Word 正文，或先另存为 TXT 再导入。
