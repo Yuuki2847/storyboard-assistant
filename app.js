@@ -129,10 +129,21 @@ ui.script.addEventListener("change", async () => {
     if (extension === ".txt" || extension === ".md") {
       contents = await file.text();
     } else {
-      if (location.protocol === "file:") throw new Error("读取 Word 或 Excel 请先运行 node server.js，再打开 http://127.0.0.1:8765。");
-      const response = await fetch("/read-office", {
-        method: "POST", headers: { "X-Script-Extension": extension }, body: file
-      });
+      const setup = "请在项目目录运行 node server.js，再用 Edge 或 Chrome 打开 http://127.0.0.1:8765/。";
+      if (location.origin !== "http://127.0.0.1:8765") {
+        throw new Error("当前页面未连接本机 Office 读取服务。" + setup);
+      }
+      let response;
+      try {
+        response = await fetch("/read-office", {
+          method: "POST", headers: { "X-Script-Extension": extension }, body: file
+        });
+      } catch {
+        throw new Error("无法连接本机 Office 读取服务。" + setup);
+      }
+      if (response.headers.get("X-Storyboard-Office") !== "1") {
+        throw new Error(`当前页面未接通 Office 读取接口（HTTP ${response.status}）。` + setup);
+      }
       contents = await response.text();
       if (!response.ok) throw new Error(contents);
     }

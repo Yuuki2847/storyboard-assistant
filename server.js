@@ -38,6 +38,7 @@ http.createServer(async (req, res) => {
     }
   }
   if (req.url !== "/read-office" || req.method !== "POST") return reply(res, 404, "页面不存在。");
+  res.setHeader("X-Storyboard-Office", "1");
   if (req.headers.origin !== "http://" + host) return reply(res, 403, "请从本地应用导入文件。");
 
   const extension = req.headers["x-script-extension"];
@@ -57,10 +58,15 @@ http.createServer(async (req, res) => {
     const path = join(directory, "script" + extension);
     await writeFile(path, Buffer.concat(chunks));
     const { stdout } = await run("powershell.exe", [
-      "-NoProfile", "-NonInteractive", "-File", join(__dirname, "read-office.ps1"), path, extension
+      "-NoProfile", "-NonInteractive", "-STA", "-ExecutionPolicy", "RemoteSigned",
+      "-File", join(__dirname, "read-office.ps1"), path, extension
     ], { windowsHide: true, timeout: 45_000, maxBuffer: 8 * 1024 * 1024 });
     reply(res, 200, stdout);
-  } catch {
+  } catch (error) {
+    console.error("Office import failed:", error.stderr?.trim() || error.message);
+    if (/PSSecurityException|running scripts is disabled/i.test(error.stderr ?? "")) {
+      return reply(res, 500, "Windows PowerShell 执行策略阻止了 Office 读取脚本。请检查此项目脚本的执行权限。");
+    }
     reply(res, 422, "无法读取文件。请确认已安装并初始化 Microsoft Word 或 Excel，且文件可打开、无密码保护。");
   } finally {
     if (directory) await rm(directory, { recursive: true, force: true }).catch(() => {});
