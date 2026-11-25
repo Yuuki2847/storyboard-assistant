@@ -13,6 +13,8 @@ function render() {
   ui.shot.disabled = ui.export.disabled = ui.png.disabled = ui.notes.disabled = !active;
   ui.remove.disabled = !active?.points[ui.point.value];
   ui.review.replaceChildren();
+  ui.samples.hidden = !active;
+  ui.samples.replaceChildren();
   if (!active) {
     ui.review.textContent = "导入一张草稿开始审阅。";
     return;
@@ -72,6 +74,33 @@ function render() {
       ui.review.append(paragraph);
     }
   }
+  renderSamples(active);
+}
+
+function renderSamples(shot) {
+  const heading = document.createElement("h2");
+  heading.textContent = "修改样图";
+  ui.samples.append(heading);
+  for (const [index, sample] of makeSamples(shot).entries()) {
+    const card = document.createElement("figure");
+    const title = document.createElement("h3");
+    title.textContent = sample.title;
+    sample.canvas.setAttribute("aria-label", sample.title);
+    const caption = document.createElement("figcaption");
+    caption.textContent = sample.description;
+    const button = document.createElement("button");
+    button.type = "button";
+    button.textContent = "下载样图";
+    button.addEventListener("click", () => {
+      const name = shot.name.replace(/\.[^.]+$/, "");
+      sample.canvas.toBlob(blob => {
+        if (blob) download(blob, `${name}-sample-${index + 1}.png`);
+        else ui.status.textContent = "无法生成样图 PNG。";
+      }, "image/png");
+    });
+    card.append(title, sample.canvas, caption, button);
+    ui.samples.append(card);
+  }
 }
 
 function getReview(shot) {
@@ -91,13 +120,31 @@ ui.script.addEventListener("change", async () => {
   const file = ui.script.files[0];
   if (!file) return;
   const target = active;
+  const extension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
+  ui.script.disabled = true;
+  ui.status.textContent = "正在读取剧本…";
   try {
-    const contents = await file.text();
-    if (target) target.excerpt = contents;
-    if (target === active) ui.excerpt.value = contents;
+    let contents;
+    if (extension === ".txt" || extension === ".md") {
+      contents = await file.text();
+    } else {
+      if (location.protocol === "file:") throw new Error("读取 Word 或 Excel 请先运行 node server.js，再打开 http://127.0.0.1:8765。");
+      const response = await fetch("/read-office", {
+        method: "POST", headers: { "X-Script-Extension": extension }, body: file
+      });
+      contents = await response.text();
+      if (!response.ok) throw new Error(contents);
+    }
+    const destination = target ?? active;
+    if (destination) destination.excerpt = contents;
+    if (destination === active) ui.excerpt.value = contents;
     render();
-  } catch {
-    ui.status.textContent = "无法读取剧本文件。";
+    ui.status.textContent = "已读取剧本 " + file.name;
+  } catch (error) {
+    ui.status.textContent = error.message || "无法读取剧本文件。";
+  } finally {
+    ui.script.value = "";
+    ui.script.disabled = false;
   }
 });
 

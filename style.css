@@ -23,5 +23,9 @@ canvas:not([hidden]) { display: block; width: 100%; height: auto; cursor: crossh
 #status { margin: .65rem 0 0; }
 h3 { font-size: 1rem; color: #a7d8ff; }
 #review p { line-height: 1.55; }
+#samples { margin: 1.25rem 0; }
+#samples figure { margin: 0 0 .9rem; border: 1px solid #363e4f; border-radius: 8px; padding: .7rem; }
+#samples canvas { cursor: default; border-radius: 4px; }
+#samples figcaption { margin: .6rem 0; font-size: .9rem; line-height: 1.5; }
 @media (max-width: 1000px) { main { grid-template-columns: 1fr 2fr; } main aside:last-child { grid-column: 1 / -1; } }
 @media (max-width: 640px) { main { grid-template-columns: 1fr; } }
