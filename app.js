@@ -120,9 +120,10 @@ ui.script.addEventListener("change", async () => {
   const file = ui.script.files[0];
   if (!file) return;
   const target = active;
+  const forDrawing = !ui.drawWorkspace.hidden;
   const extension = file.name.slice(file.name.lastIndexOf(".")).toLowerCase();
   ui.script.disabled = true;
-  ui.status.textContent = "正在读取剧本…";
+  ui.importStatus.textContent = "正在读取剧本…";
   try {
     let contents;
     if (extension === ".txt" || extension === ".md") {
@@ -135,13 +136,17 @@ ui.script.addEventListener("change", async () => {
       contents = await response.text();
       if (!response.ok) throw new Error(contents);
     }
-    const destination = target ?? active;
-    if (destination) destination.excerpt = contents;
-    if (destination === active) ui.excerpt.value = contents;
-    render();
-    ui.status.textContent = "已读取剧本 " + file.name;
+    if (forDrawing) {
+      ui.storyText.value = contents;
+    } else {
+      const destination = target ?? active;
+      if (destination) destination.excerpt = contents;
+      if (destination === active) ui.excerpt.value = contents;
+      render();
+    }
+    ui.importStatus.textContent = "已读取剧本 " + file.name;
   } catch (error) {
-    ui.status.textContent = error.message || "无法读取剧本文件。";
+    ui.importStatus.textContent = error.message || "无法读取剧本文件。";
   } finally {
     ui.script.value = "";
     ui.script.disabled = false;
@@ -224,5 +229,39 @@ ui.png.addEventListener("click", () => {
     if (blob) download(blob, filename);
     else ui.status.textContent = "无法生成标注 PNG。";
   }, "image/png");
+});
+for (const drawing of [false, true]) {
+  const button = drawing ? ui.drawMode : ui.reviewMode;
+  button.addEventListener("click", () => {
+    ui.drawWorkspace.hidden = !drawing;
+    ui.reviewWorkspace.hidden = drawing;
+    ui.drawMode.setAttribute("aria-pressed", String(drawing));
+    ui.reviewMode.setAttribute("aria-pressed", String(!drawing));
+  });
+}
+
+ui.generateShots.addEventListener("click", () => {
+  const shots = planStoryboard(ui.storyText.value);
+  ui.generatedShots.replaceChildren();
+  ui.generationStatus.textContent = shots.length
+    ? `已生成 ${Math.min(60, shots.length)} 张示意分镜。` + (shots.length > 60 ? "可分段生成其余镜头。" : "")
+    : "请导入或粘贴含有动作、台词或镜头内容的剧本。";
+  for (const [index, shot] of shots.slice(0, 60).entries()) {
+    const card = document.createElement("figure");
+    const title = document.createElement("h3");
+    title.textContent = `镜头 ${index + 1} · ${shot.scale}` + (shot.scene ? ` · ${shot.scene}` : "");
+    const frame = drawStoryboardFrame(shot);
+    frame.setAttribute("aria-label", title.textContent);
+    const caption = document.createElement("figcaption");
+    caption.textContent = shot.text;
+    const button = document.createElement("button");
+    button.textContent = "下载分镜 PNG";
+    button.addEventListener("click", () => frame.toBlob(blob => {
+      if (blob) download(blob, `storyboard-${index + 1}.png`);
+      else ui.generationStatus.textContent = "无法生成分镜 PNG。";
+    }));
+    card.append(title, frame, caption, button);
+    ui.generatedShots.append(card);
+  }
 });
 render();

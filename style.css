@@ -29,3 +29,13 @@ h3 { font-size: 1rem; color: #a7d8ff; }
 #samples figcaption { margin: .6rem 0; font-size: .9rem; line-height: 1.5; }
 @media (max-width: 1000px) { main { grid-template-columns: 1fr 2fr; } main aside:last-child { grid-column: 1 / -1; } }
 @media (max-width: 640px) { main { grid-template-columns: 1fr; } }
+
+[hidden] { display: none !important; }
+.workspace-bar { display: flex; flex-wrap: wrap; align-items: start; gap: 1rem; padding: 1rem 2rem 0; }
+.workspace-bar button[aria-pressed="true"] { background: #344660; border-color: #a7d8ff; }
+#drawWorkspace { margin: 1rem; }
+#generationStatus { margin: .75rem 0; }
+#generatedShots { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 1rem; }
+#generatedShots figure { margin: 0; padding: .8rem; border: 1px solid #363e4f; border-radius: 8px; }
+#generatedShots canvas { cursor: default; border-radius: 4px; }
+#generatedShots figcaption { margin: .7rem 0; white-space: pre-wrap; overflow-wrap: anywhere; }

@@ -5,9 +5,13 @@
 <title>分镜审阅台</title>
 <link rel="stylesheet" href="style.css">
 <header><h1>分镜审阅台</h1><p>结合剧本意图审阅构图、景深和人物姿态。</p></header>
-<main>
-<aside>
+<div class="workspace-bar">
+<nav aria-label="工作模式"><button id="reviewMode" aria-pressed="true">审阅分镜</button> <button id="drawMode" aria-pressed="false">从剧本绘制</button></nav>
 <label>导入剧本（TXT / MD / Word / Excel）<input id="script" type="file" accept=".txt,.md,.doc,.docx,.xls,.xlsx"></label>
+<p id="importStatus" role="status"></p>
+</div>
+<main id="reviewWorkspace">
+<aside>
 <label>当前镜头的剧本文字<textarea id="excerpt" rows="7" placeholder="导入后可在这里保留当前镜头相关的动作和台词。"></textarea></label>
 <label>导入分镜草稿（可多选）<input id="images" type="file" accept="image/png,image/jpeg,image/webp" multiple></label>
 <label>当前分镜<select id="shot" disabled></select></label>
@@ -30,7 +34,15 @@
 <div class="toolbar"><button id="export" disabled>导出审阅 JSON</button><button id="png" disabled>导出标注 PNG</button></div>
 </aside>
 </main>
+<section id="drawWorkspace" hidden>
+<h2>从剧本绘制</h2>
+<label>剧本文字<textarea id="storyText" rows="8" placeholder="导入或粘贴剧本。可用「第 1 场」「镜头 1」等标题明确场次和镜头。"></textarea></label>
+<button id="generateShots">生成示意分镜</button>
+<p id="generationStatus" role="status"></p>
+<div id="generatedShots"></div>
+</section>
 <script src="review.js"></script>
 <script src="samples.js"></script>
+<script src="storyboard.js"></script>
 <script src="app.js"></script>
 </html>
